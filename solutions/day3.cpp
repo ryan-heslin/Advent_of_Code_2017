@@ -56,72 +56,64 @@ int solve_part2(int target){
     while(true){
         current_side += 2;
         half = floor(current_side /2);
-        imin = center + half;
-        imax = center - half;
-        //Avoid double-entering
+        imin = center - half;
+        imax = center + half;
+        //One-time adjustment
         x ++;
+        y --;
         // Left; ignore right and above
         left = x -1;
-        for(int i = 0; i < current_side - 1; i++ ){
+
+        while( y < imax){
+            y ++;
             current = numbers[y-1][x] + numbers[y-1][left] + numbers[y][left]
                 + numbers[y+1][left];
-            cout << current << "\n";
             if (current > target){
                 return current;
 
             }
             numbers[y][x] = current;
-            y ++;
-            }
-        y --;
+
+        }
+
         // Top
-        x--;
         below = y-1;
-        for(int i = 0; i < current_side - 1; i++ ){
-                    current = numbers[y][x-1] + numbers[below][x-1] + numbers[below][x]
+        while(x > imin){
+                    x--;
+                    current = numbers[y][x+1] + numbers[below][x-1] + numbers[below][x]
                         + numbers[below][x+1];
-                    cout << current << "\n";
                     if (current > target){
                         return current;
 
                     }
                     numbers[y][x] = current;
-                    x --;
                     }
-        x ++;
 
         // Right
-        y -- ;
         right = x + 1;
-        for(int i = 0; i < current_side - 1; i ++ ){
+        while(y > imin){
+                    y--;
                     current = numbers[y+1][x] + numbers[y-1][right] + numbers[y][right]
                         + numbers[y+1][right];
-                        cout << current << "\n";
                     if (current > target){
                         return current;
 
                     }
                     numbers[y][x] = current;
-                    y --;
                     }
         // Bottom
-        y ++;
-        x ++;
         above = y + 1;
-        for(int i = 0; i < current_side -1 ; i++ ){
-                    current = numbers[y][x+1] + numbers[above][x-1] + numbers[above][x]
+        while(x < imax){
+                    x++;
+                    current = numbers[y][x-1] + numbers[above][x-1] + numbers[above][x]
                         + numbers[above][x+1];
-                        cout << current << "\n";
                     if (current > target){
                         return current;
 
                     }
                     numbers[y][x] = current;
-                    x ++;
                     }
-        x--;
     }
-    cout << "\n\n";
 
 }
 
@@ -132,14 +124,7 @@ pair<int , int> result = find_start(target);
 int part1 = find_distance(result.first, result.second, target);
 cout << part1 << "\n";
 
-int part2 = solve_part2(747);
+int part2 = solve_part2(target);
 cout << part2 << "\n";
 return 0;
 }
-
-
-    // int distance = floor(side_length / 2);
-    // int modulus  (target - 1) % distance;
-    // distance += (modulus == 0) ? distance : modulus;
-    // return distance;
-    // }
