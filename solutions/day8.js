@@ -10,9 +10,6 @@ const ops = {">=" : function(lhs, rhs) {return lhs >= rhs;},
 ;}
 }
 
-function as_key(chars){
-    return "['" + chars + "']"
-}
 function parse(line){
     let parts = line.split(" ");
     parts[2] = Number(parts[2]);

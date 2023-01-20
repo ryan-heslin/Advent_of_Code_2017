@@ -19,7 +19,6 @@ function solve(state){
             state[(target + i) % size] += per_block + (leftover > 0);
             leftover --;
         }
-        //console.log(state);
         let record = state.toString();
         if(record in seen){
             return [i, i - seen[record] ] ;
