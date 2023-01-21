@@ -102,4 +102,3 @@ weigh(part1);
 
 const part2 = balance(part1, 0);
 console.log(part2);
-//1086 too high
