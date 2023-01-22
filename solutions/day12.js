@@ -1,17 +1,19 @@
-function parse_line(line){
+const fs = require('fs');
+
+function parse_line(line) {
     let parts = line.split(" <-> ");
     parts[1] = parts[1].split(", ");
     return parts;
 }
 
-function count(parent, groups){
+function count(parent, groups) {
     let children = new Set();
-    function helper(id){
+    function helper(id) {
         let ids = groups[id];
         children.add(id);
 
-        for(child of ids){
-            if(!(children.has(child))){
+        for (child of ids) {
+            if (!(children.has(child))) {
                 helper(child);
             }
         }
@@ -21,18 +23,18 @@ function count(parent, groups){
     return children;
 }
 
-function count_groups(groups, target){
+function count_groups(groups, target) {
     let visited = new Set();
     let found = 0;
     let part1 = NaN;
-    for(key of Object.keys(groups)){
-        if(!(visited.has(key))){
+    for (key of Object.keys(groups)) {
+        if (!(visited.has(key))) {
             let new_group = count(key, groups);
-            if(key == target){
+            if (key == target) {
                 part1 = new_group.size;
             }
             visited = new Set([...visited, ...new_group]);
-            found ++;
+            found++;
         }
     }
     return [part1, found];
@@ -40,7 +42,6 @@ function count_groups(groups, target){
 
 
 
-const fs = require('fs');
 const raw_input = fs.readFileSync('inputs/day12.txt', 'utf-8').toString().split("\n");
 raw_input.pop();
 const groups = Object.fromEntries(raw_input.map(parse_line));
