@@ -68,7 +68,7 @@ def recover(instructions):
     return part1[0], mapping
 
 
-def part2(instructions):
+def solve_part2(instructions):
 
     length = len(instructions)
     sent = {0: 0, 1: 0}
@@ -91,7 +91,7 @@ def part2(instructions):
             return i + 1
 
         def jgz(x, y, i):
-            i += registers.get(y, y) if registers[x] > 0 else 1
+            i += registers.get(y, y) if registers.get(x, x) > 0 else 1
             return i
 
         mapping = {
@@ -110,8 +110,6 @@ def part2(instructions):
 
         while 0 <= i < length:
             args = instructions[i]
-            # print(args)
-            # print(dict(registers))
             if args[0] == "snd":
                 i += 1
                 sent[initial] += 1
@@ -129,69 +127,60 @@ def part2(instructions):
     program0 = program(0)
     program1 = program(1)
     programs = {
-        0: {"program": program0, "queue": deque([]), "exhausted": False},
-        1: {"program": program1, "queue": deque([]), "exhausted": False},
+        0: {"program": program0, "queue": deque([]), "exhausted": False, "last": 0},
+        1: {"program": program1, "queue": deque([]), "exhausted": False, "last": 0},
     }
 
     # Run both to first receive
-    while not programs[0]["exhausted"]:
-        new_value = next(programs[0]["program"])
-        if type(new_value) == int:
-            programs[1]["queue"].appendleft(new_value)
-        else:
-            if not new_value:
-                programs[0]["exhausted"] = True
-            break
+
+    # While first iteration or either program cycled at least once this iteration
+    # For program 0
+    # Run until unable from queue exhasution or program termination
+    # For program 1
+    # Run until unable from queue exhasution or program termination
 
     while True:
-        new_value = next(programs[1]["program"])
-        if type(new_value) == int:
-            programs[1]["queue"].appendleft(new_value)
-        else:
-            if not new_value:
-                return sent[1]
-            break
 
-    while True:
-        # Run until needs data
-        # False means program completed
-        print(programs)
-        # Deadlock - no data available
-        if not (programs[0]["queue"] or programs[1]["queue"]):
-            return sent[1]
-
-        print(programs)
-        next_value = True
-        while programs[1]["queue"]:
-            # Receiving new value
-            if type(next_value) == int:
-                # Sending new value
-                programs[0]["queue"].appendleft(next_value)
-                next_value = next(programs[1]["program"])
+        iterations = 0
+        first = True
+        while not programs[0]["exhausted"]:
+            if type(programs[0]["last"]) == int:
+                if not first:
+                    programs[1]["queue"].appendleft(programs[0]["last"])
+                programs[0]["last"] = next(programs[0]["program"])
             else:
-                if next_value:
-                    next_value = programs[1]["program"].send(programs[1]["queue"].pop())
+                if not programs[0]["last"]:
+                    programs[0]["exhausted"] = True
+                    break
+                if len(programs[0]["queue"]):
+                    programs[0]["last"] = programs[0]["program"].send(
+                        programs[0]["queue"].pop()
+                    )
                 else:
-                    return sent[1]
+                    break
+            iterations += 1
+            first = False
 
-        print(programs[0])
-        if not programs[0]["exhausted"]:
-            next_value = True
-            while programs[0]["queue"]:
-                if type(next_value) == int:
-                    # Sending new value
-                    programs[1]["queue"].appendleft(next_value)
-                    next_value = next(programs[0]["program"])
+        first = True
+        while True:
+            if type(programs[1]["last"]) == int:
+                if not first:
+                    programs[0]["queue"].appendleft(programs[1]["last"])
+                programs[1]["last"] = next(programs[1]["program"])
+            else:
+                if not programs[1]["last"]:
+                    return sent[1]
+                if len(programs[1]["queue"]):
+                    programs[1]["last"] = programs[1]["program"].send(
+                        programs[1]["queue"].pop()
+                    )
                 else:
-                    if next_value:
-                        next_value = programs[0]["program"].send(
-                            programs[0]["queue"].pop()
-                        )
-                    else:
-                        programs[0]["exhausted"] = True
-                        break
-        print("---------------")
-        # breakpoint()
+                    break
+            iterations += 1
+            first = False
+
+        if iterations == 0:
+            return sent[1]
 
 
 with open("inputs/day18.txt") as f:
@@ -201,8 +190,5 @@ instructions = [parse(line) for line in raw_input]
 part1, mapping = recover(instructions)
 print(part1)
 
-part2 = part2(instructions)
+part2 = solve_part2(instructions)
 print(part2)
-
-# TODO ensure functions can actually write registers
-# 132 too low
