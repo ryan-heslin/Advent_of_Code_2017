@@ -33,26 +33,90 @@ function jnz(x, y, i) {
     return i;
 }
 
+function is_number(x) {
+    return /-?\d+/.test(x);
+
+}
+
+function is_composite(x) {
+    if (x % 2 == 0 || x % 3 == 0) return true;
+    let stop = Math.ceil(Math.sqrt(x));
+    let divisor = 6;
+    while (divisor - 1 < stop) {
+        if (x % (divisor - 1) == 0 || x % (divisor + 1) == 0) return true;
+        divisor += 6;
+    }
+    return false;
+
+
+}
+
 
 const functions = { "set": set, "sub": sub, "mul": mul, "jnz": jnz }
 const raw_input = fs.readFileSync('inputs/day23.txt', 'utf-8').toString().split("\n");
 raw_input.pop();
 const instructions = raw_input.map(parse_line);
 
-function to_function(line) {
-    let func = functions[line[0]]
-    if (typeof line[1] === "string" && typeof line[2] === "string") {
-        let result = function() { func(registers[line[1]], registers[line[2]]) };
-    } else if (typeof line[1] === "string") {
-        let result = function() { func(registers[line[1]], line[2]) };
-    } else if (typeof line[2] === "string") {
-        let result = function() { func(line[1], registers[line[2]]) };
+function to_function(parts) {
+    let first = parts[1];
+    let second = parts[2];
+    let second_number = is_number(second);
+    if (second_number) { second = Number(second) };
+    if (parts[0] == "set") {
+        if (second_number) {
+            return function(i) {
+                registers[first] = second;
+                return i + 1;
+            }
+        } else {
+            return function(i) {
+                registers[first] = registers[second];
+                return i + 1;
+            }
+        }
+
+    } else if (parts[0] == "mul") {
+        if (second_number) {
+            return function(i) {
+                registers[first] *= second;
+                return i + 1;
+            }
+        } else {
+            return function(i) {
+                registers[first] *= registers[second];
+                return i + 1;
+            }
+        }
+    } else if (parts[0] == "sub") {
+        if (second_number) {
+            return function(i) {
+                registers[first] -= second;
+                return i + 1;
+            }
+        } else {
+            return function(i) {
+                registers[first] -= registers[second];
+                return i + 1;
+            }
+        }
     } else {
-        let result = function() { func(line[1], line[2]) };
+        let first_number = is_number(first);
+        if (first_number) {
+            first = Number(first);
+        }
+        // Second jump arg always constant
+        if (first_number) {
+            if (first == 0) {
+                return function(i) { return i + 1 }
+            } else {
+                return function(i) { return i + second }
+            }
+        } else {
+            return function(i) { return i + (registers[first] == 0 ? 1 : second) }
+        }
     }
-    return result;
 }
-instructions = instructions.map(to_function);
+
 let i = 0;
 while (i < instructions.length) {
     args = instructions[i];
@@ -65,35 +129,61 @@ let j = 0;
 for (k of Object.keys(registers)) {
     registers[k] = 0;
 }
-a = 1;
+registers["a"] = 1;
 
-let lines = {};
-let counter = 0;
-j = 3;
-// THe key: sometimes the jnz f 0 clause skips writing to h, so fewer
-// than 1000 writes are done.
-// Each loop: inc b, g, e 17
-// These are values after first loop through 'jnz g -13' instruction
-// registers["a"] = 1;
-// registers["b"] = 122683;
-// registers["c"] = 122700;
-// registers["d"] = 105700;
-// registers["e"] = 122683;
-// registers["f"] = 0;
-// registers["g"] = -17;
-// registers["h"] = 1;
-// Innermost loop is mod test, says subreddit
-while (j < instructions.length) {
-    counter++;
-    args = instructions[j];
-    j = functions[args[0]](args[1], args[2], j);
-    // if (j == 23) {
-    //     console.log(registers);
-    //     console.log("\n");
-    // }
-    if (j == 25) {
-        console.log(registers);
-    }
+j = 0;
+let optimized_instructions = instructions.map(to_function);
+const stop = optimized_instructions.length;
+
+// I presume this finds the relevant jump line for all inputs
+let index = stop;
+let found = 0;
+while (found < 5) {
+    index -= 1
+    found += (instructions[index][0] == "jnz")
 }
-console.log(registers["h"]);
-//1000 too high
+let target_line = index;
+
+while (j != target_line) {
+    j = optimized_instructions[j](j);
+}
+
+const lower = registers["b"];
+const upper = registers["c"];
+let step = instructions[stop - 2][2];
+let composites = 0;
+let current = upper;
+
+while (current >= lower) {
+    composites += is_composite(current);
+    current += step;
+}
+console.log(composites);
+
+// let last_b = 105700;
+// const c = 122700;
+// const de = 105700;
+// let g = 0;
+// while (true) {
+//     //counter++;
+//     if (j == 24) {
+//         console.log(registers);
+//         registers["b"] = last_b;
+//         registers["c"] = c;
+//         registers["d"] = de;
+//         registers["e"] = de;
+//         registers["f"] = 0;
+//         registers["g"] = 0;
+//         j = 25;
+//         last_b += 17;
+//     }
+//     j = optimized_instructions[j](j);
+//     // args = instructions[j];
+//     // j = functions[args[0]](args[1], args[2], j);
+//     // if (j == 23) {
+//     //     console.log(registers);
+//     //     console.log("\n");
+//     // }
+//     // Once this is true, we know h will be written, so skip remaining loop
+//     //if (j == 19) console.log(registers);
+// }
