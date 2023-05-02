@@ -20,6 +20,8 @@ minimize <- function(data, iterations) {
 }
 
 simulate <- function(particles, iterations) {
+    streak <- 0
+    old <- nrow(particles)
     for (i in seq_len(iterations)) {
         sequence <- seq_len(nrow(particles))
         for (j in sequence) {
@@ -33,6 +35,14 @@ simulate <- function(particles, iterations) {
         counts <- table(hashes)
         duplicates <- names(counts[counts > 1])
         particles <- particles[!hashes %in% duplicates, ]
+        new <- nrow(particles)
+        if (new != old) {
+            streak <- 0
+        } else {
+            streak <- streak + 1
+        }
+        if (streak > 100) break
+        old <- new
     }
     nrow(particles)
 }

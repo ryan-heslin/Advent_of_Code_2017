@@ -37,49 +37,40 @@ rotate_90 <- function(x) {
 map_transforms <- function(pair, mapping) {
     target <- pair[[1]]
     result <- pair[[2]]
-    hash <- hash_matrix(target)
-    mapping[[hash]] <- result
     # Constant matrix, no need for rotations
-    if (sum(target) == prod(dim(target))) {
+    if (length(unique(target)) == 1) {
+        hash <- hash_matrix(target)
+        mapping[[hash]] <- result
         return()
     }
 
 
     for (i in seq_len(4)) {
         hflipped <- hflip(target)
-        if (isTRUE(mapping[[hash_matrix(target)]] != result)) stop()
         mapping[[hash_matrix(hflipped)]] <- result
         vflipped <- vflip(target)
-        if (isTRUE(mapping[[hash_matrix(target)]] != result)) stop()
         mapping[[hash_matrix(vflipped)]] <- result
         target <- rotate_90(target)
-        if (isTRUE(mapping[[hash_matrix(target)]] != result)) stop()
         mapping[[hash_matrix(target)]] <- result
     }
 }
 
 expand <- function(start, iterations, mapping) {
     for (i in seq_len(iterations)) {
-        # browser()
         extent <- nrow(start)
-        dimension <- 2 + (extent %% 3 == 0)
+        dimension <- if (extent %% 2 == 0) 2 else 3
         increment <- dimension - 1
         sequence <- seq(from = 1, to = extent - dimension + 1, by = dimension)
-        print(sequence)
 
-        browser()
-        temp <- lapply(sequence, \(i){
+        start <- lapply(sequence, \(i){
             rows <- i:(i + increment)
             lapply(
                 sequence,
                 \(j) mapping[[hash_matrix(start[rows, j:(j + increment)])]]
             )
-        })
-        print(temp)
-        start <- temp |>
+        }) |>
             lapply(do.call, what = cbind) |>
             do.call(what = rbind)
-        print(start)
     }
     start
 }
@@ -90,10 +81,9 @@ seed <- ".#.
 ###"
 processed <- strsplit(raw_input, "\\s=>\\s") |>
     lapply(parse_line)
-processed
 
 mapping <- new.env()
-lapply(processed, map_transforms, mapping = mapping)
+invisible(lapply(processed, map_transforms, mapping = mapping))
 start <-
     gsub("(?<=.)\\n?(?=.)", ",", seed, perl = TRUE) |>
     gsub(pattern = "\\.", replacement = "0") |>
@@ -103,7 +93,13 @@ start <-
     strtoi() |>
     matrix(byrow = TRUE, nrow = sqrt(nchar(gsub("\\n", "", seed))))
 
-result <- expand(start, 5, mapping)
+part1_iterations <- 5
+part2_iterations <- 18
+result <- expand(start, part1_iterations, mapping)
 part1 <- sum(result)
+
+result <- expand(result, part2_iterations - part1_iterations, mapping)
+part2 <- sum(result)
 print(part1)
-# 145 too low
+part2 <- sum(result)
+print(part2)

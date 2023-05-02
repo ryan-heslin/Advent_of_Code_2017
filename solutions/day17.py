@@ -31,5 +31,7 @@ print(part1)
 current_i, after_zero = 0, 0
 for i in range(1, 50000000):
     current_i = ((current_i + step_len) % i) + 1
+    if current_i == 1:
+        after_zero = i
 
-print(current_i)
+print(after_zero)

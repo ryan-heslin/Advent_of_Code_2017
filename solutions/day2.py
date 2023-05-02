@@ -21,4 +21,5 @@ for row in processed:
                 done = True
                 break
 
+part2 = int(part2)
 print(part2)
