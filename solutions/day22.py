@@ -58,8 +58,10 @@ with open("inputs/day22.txt") as f:
     raw_input = f.read().splitlines()
 
 grid, start = parse(raw_input)
-part1 = simulate(grid.copy(), 10000, start)
+part1_i = 10000
+part2_i = 10000000
+part1 = simulate(grid.copy(), part1_i, start)
 print(part1)
 
-part2 = simulate_part2(grid, 10000000, start)
+part2 = simulate_part2(grid, part2_i, start)
 print(part2)

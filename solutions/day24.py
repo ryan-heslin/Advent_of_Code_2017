@@ -84,7 +84,7 @@ def build_outer(components):
     return (maxes[0]["weight"], part2)
 
 
-parsed = list(map(lambda x: Component(x), raw))
+parsed = list(map(Component, raw))
 result = tuple(build_outer(parsed))
 print(result[0])
 print(result[1])

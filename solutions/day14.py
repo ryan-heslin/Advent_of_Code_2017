@@ -3,10 +3,6 @@ from collections import deque
 
 import utils.knot_hash as kh
 
-hex_digits = "0123456789abcdef"
-values = (bin(int(x, 16))[2:].zfill(4) for x in hex_digits)
-mapping = dict(zip(hex_digits, values))
-
 
 def hash2bits(hash):
     return "".join(mapping[x] for x in hash)
@@ -49,6 +45,11 @@ def neighbors(x):
         complex(x.real, x.imag - 1),
         complex(x.real, x.imag + 1),
     )
+
+
+hex_digits = "0123456789abcdef"
+values = (bin(int(x, 16))[2:].zfill(4) for x in hex_digits)
+mapping = dict(zip(hex_digits, values))
 
 
 filled = create_rows(stem="oundnydw")

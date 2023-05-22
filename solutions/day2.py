@@ -2,7 +2,7 @@ with open("inputs/day2.txt") as f:
     raw_input = f.read().splitlines()
 
 
-processed = [[int(y) for y in x.split()] for x in raw_input]
+processed = list(map(lambda x: list(map(int, x.split())), raw_input))
 part1 = sum(max(x) - min(x) for x in processed)
 print(part1)
 

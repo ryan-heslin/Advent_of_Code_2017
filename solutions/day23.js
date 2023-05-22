@@ -53,9 +53,6 @@ function is_composite(x) {
 
 
 const functions = { "set": set, "sub": sub, "mul": mul, "jnz": jnz }
-const raw_input = fs.readFileSync('inputs/day23.txt', 'utf-8').toString().split("\n");
-raw_input.pop();
-const instructions = raw_input.map(parse_line);
 
 function to_function(parts) {
     let first = parts[1];
@@ -117,6 +114,9 @@ function to_function(parts) {
     }
 }
 
+const raw_input = fs.readFileSync('inputs/day23.txt', 'utf-8').toString().split("\n");
+raw_input.pop();
+const instructions = raw_input.map(parse_line);
 let i = 0;
 while (i < instructions.length) {
     args = instructions[i];
@@ -159,31 +159,3 @@ while (current >= lower) {
     current += step;
 }
 console.log(composites);
-
-// let last_b = 105700;
-// const c = 122700;
-// const de = 105700;
-// let g = 0;
-// while (true) {
-//     //counter++;
-//     if (j == 24) {
-//         console.log(registers);
-//         registers["b"] = last_b;
-//         registers["c"] = c;
-//         registers["d"] = de;
-//         registers["e"] = de;
-//         registers["f"] = 0;
-//         registers["g"] = 0;
-//         j = 25;
-//         last_b += 17;
-//     }
-//     j = optimized_instructions[j](j);
-//     // args = instructions[j];
-//     // j = functions[args[0]](args[1], args[2], j);
-//     // if (j == 23) {
-//     //     console.log(registers);
-//     //     console.log("\n");
-//     // }
-//     // Once this is true, we know h will be written, so skip remaining loop
-//     //if (j == 19) console.log(registers);
-// }

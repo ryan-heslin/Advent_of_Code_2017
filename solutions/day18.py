@@ -131,14 +131,6 @@ def solve_part2(instructions):
         1: {"program": program1, "queue": deque([]), "exhausted": False, "last": 0},
     }
 
-    # Run both to first receive
-
-    # While first iteration or either program cycled at least once this iteration
-    # For program 0
-    # Run until unable from queue exhasution or program termination
-    # For program 1
-    # Run until unable from queue exhasution or program termination
-
     while True:
 
         iterations = 0

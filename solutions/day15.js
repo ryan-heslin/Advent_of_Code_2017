@@ -10,7 +10,7 @@ function solve(a, b) {
     let as = [];
     let bs = [];
 
-    while ((i < 40000000) || (as.length < part2_length) || (bs.length < part2_length)) {
+    while ((i < 40000000) || ((as.length < part2_length) || (bs.length < part2_length))) {
         a["number"] *= a["factor"];
         b["number"] *= b["factor"];
         a["number"] %= divisor;

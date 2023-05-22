@@ -47,8 +47,6 @@ simulate <- function(particles, iterations) {
     nrow(particles)
 }
 
-
-
 raw_input <- readLines("inputs/day20.txt")
 
 vectors <- strsplit(raw_input, ",\\s")
