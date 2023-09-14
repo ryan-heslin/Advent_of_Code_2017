@@ -52,7 +52,8 @@ values = (bin(int(x, 16))[2:].zfill(4) for x in hex_digits)
 mapping = dict(zip(hex_digits, values))
 
 
-filled = create_rows(stem="oundnydw")
+raw_input = "oundnydw"
+filled = create_rows(stem=raw_input)
 part1 = len(filled)
 print(part1)
 
